@@ -1,0 +1,129 @@
+
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+struct TrainJourney {
+    int availableTickets;
+    int passengers;
+    int moneyEarned;
+};
+
+class MountainRailway {
+private:
+    vector<TrainJourney> upJourneys;
+    vector<TrainJourney> downJourneys;
+
+public:
+    MountainRailway() {
+        // Initialize data for each train journey
+        for (int i = 0; i < 4; ++i) {
+            TrainJourney upJourney = {480, 0, 0}; // 480 total tickets for up journeys
+            TrainJourney downJourney = {480, 0, 0}; // 480 total tickets for down journeys
+            upJourneys.push_back(upJourney);
+            downJourneys.push_back(downJourney);
+        }
+    }
+
+    void displayTrainAvailability() {
+        cout << "Train schedule for the day:" << endl;
+        for (int i = 0; i < 4; ++i) {
+            cout << "Train " << (i + 1) << " Up: ";
+            if (upJourneys[i].availableTickets == 0) {
+                cout << "Closed ";
+            } else {
+                cout << upJourneys[i].availableTickets << " tickets available ";
+            }
+
+            cout << " - Train " << (i + 1) << " Down: ";
+            if (downJourneys[i].availableTickets == 0) {
+                cout << "Closed";
+            } else {
+                cout << downJourneys[i].availableTickets << " tickets available";
+            }
+
+            cout << endl;
+        }
+    }
+
+    void purchaseTickets(int upJourneyIndex, int downJourneyIndex, int numTickets) {
+        if (upJourneys[upJourneyIndex].availableTickets >= numTickets &&
+            downJourneys[downJourneyIndex].availableTickets >= numTickets) {
+            int totalCost = numTickets * 25;
+
+            int numGroups = numTickets / 10;
+            totalCost -= numGroups * 25;
+
+            upJourneys[upJourneyIndex].availableTickets -= numTickets;
+            downJourneys[downJourneyIndex].availableTickets -= numTickets;
+            upJourneys[upJourneyIndex].passengers += numTickets;
+            downJourneys[downJourneyIndex].passengers += numTickets;
+            upJourneys[upJourneyIndex].moneyEarned += totalCost;
+            downJourneys[downJourneyIndex].moneyEarned += totalCost;
+
+            cout << "Tickets purchased successfully!" << endl;
+        } else {
+            cout << "Tickets not available for the selected journeys." << endl;
+        }
+    }
+
+    void endOfDaySummary() {
+        int totalPassengers = 0;
+        int totalMoney = 0;
+        int maxPassengers = 0;
+        int maxPassengersIndex = -1;
+
+        for (int i = 0; i < 4; ++i) {
+            totalPassengers += upJourneys[i].passengers + downJourneys[i].passengers;
+            totalMoney += upJourneys[i].moneyEarned + downJourneys[i].moneyEarned;
+
+            int totalPassengersOnJourney = upJourneys[i].passengers + downJourneys[i].passengers;
+            if (totalPassengersOnJourney > maxPassengers) {
+                maxPassengers = totalPassengersOnJourney;
+                maxPassengersIndex = i;
+            }
+        }
+
+        cout << "End of the day summary:" << endl;
+        cout << "Total Passengers: " << totalPassengers << endl;
+        cout << "Total Money Earned: $" << totalMoney << endl;
+
+        cout << "Train Journey with the most passengers: ";
+        if (maxPassengersIndex != -1) {
+            cout << "Train " << (maxPassengersIndex + 1) << " with " << maxPassengers << " passengers." << endl;
+        } else {
+            cout << "No data available." << endl;
+        }
+    }
+};
+
+int main() {
+    MountainRailway railway;
+    int upTrainIndex, downTrainIndex, numTickets;
+
+    cout << "Welcome to the Mountain Railway system!" << endl;
+    railway.displayTrainAvailability();
+
+    cout << "\nEnter details for ticket purchase:" << endl;
+    cout << "Enter Up Train Number (1-4): ";
+    cin >> upTrainIndex;
+    cout << "Enter Down Train Number (1-4): ";
+    cin >> downTrainIndex;
+    cout << "Enter Number of Tickets: ";
+    cin >> numTickets;
+
+    if (upTrainIndex < 1 || upTrainIndex > 4 || downTrainIndex < 1 || downTrainIndex > 4 || numTickets < 1) {
+        cout << "Invalid input. Please enter valid details." << endl;
+        return 1;
+    }
+
+    railway.purchaseTickets(upTrainIndex - 1, downTrainIndex - 1, numTickets);
+
+    railway.endOfDaySummary();
+
+    return 0;
+}
+
+
